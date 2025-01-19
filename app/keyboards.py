@@ -1,50 +1,47 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder, InlineKeyboardBuilder
 
+from database.scripts.db import Data
+
+db = Data('database/bgpu.db')
 
 main_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='👩‍❤️‍👨Меры поддержки молодых семей')],
     [KeyboardButton(text='📋Контактная информация и образцы заявления')],
     [KeyboardButton(text='🏠Клуб молодых семей БГПУ «Очаг»')],
     [KeyboardButton(text='❓Мы стали молодой семьей, что дальше?')],
-    [KeyboardButton(text='✏️Вопрос-ответ')]
-],
-                           resize_keyboard=True,
-                           input_field_placeholder='Меню ниже')
+    [KeyboardButton(text='✏️Вопрос-ответ')]],
+                                    resize_keyboard=True,
+                                    input_field_placeholder='Меню ниже')
 
 support_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='️🏛БГПУ.')],
     [KeyboardButton(text='🗺Амурская область.')],
-    [KeyboardButton(text='⬅️В главное меню')]
-],
-                           resize_keyboard=True,
-                           input_field_placeholder='Меню ниже')
+    [KeyboardButton(text='⬅️В главное меню')]],
+                                    resize_keyboard=True,
+                                    input_field_placeholder='Меню ниже')
 
 contacts_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='️🏛БГПУ')],
     [KeyboardButton(text='🗺Амурская область')],
     [KeyboardButton(text='📑Образцы заявлений')],
-    [KeyboardButton(text='⬅️В главное меню')]
-],
-                           resize_keyboard=True,
-                           input_field_placeholder='Меню ниже')
+    [KeyboardButton(text='⬅️В главное меню')]],
+                                    resize_keyboard=True,
+                                    input_field_placeholder='Меню ниже')
 
 club_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='️ℹ️О клубе')],
     [KeyboardButton(text='👫Мероприятия и встречи')],
-    [KeyboardButton(text='⬅️В главное меню')]
-],
-                           resize_keyboard=True,
-                           input_field_placeholder='Меню ниже')
-
+    [KeyboardButton(text='⬅️В главное меню')]],
+                                    resize_keyboard=True,
+                                    input_field_placeholder='Меню ниже')
 
 admin_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='Добавить админа')],
-    [KeyboardButton(text='👫Мероприятия и встречи')],
-    [KeyboardButton(text='⬅️В главное меню')]
-],
-                           resize_keyboard=True,
-                           input_field_placeholder='Меню ниже')
+    [KeyboardButton(text='👮🏻‍♂️Администраторы')],
+    [KeyboardButton(text='❓Ответить на вопрос')],
+    [KeyboardButton(text='⬅️В главное меню')]],
+                                    resize_keyboard=True,
+                                    input_field_placeholder='Меню ниже')
 
 registration_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Форма регистрации", callback_data="contacts", url='new.bgpu.ru')]
@@ -57,11 +54,18 @@ registration_keyboard = InlineKeyboardMarkup(inline_keyboard=[
 #         keyboard.add(InlineKeyboardButton(text=user, url=subscription[user]))
 #     keyboard.add(InlineKeyboardButton(text='Проверить подписки и подписаться на рассылку', callback_data='check'))
 #     return keyboard.adjust(1).as_markup()
-#
-#
-# async def inline_admins():
-#     keyboard = InlineKeyboardBuilder()
-#     for user in read_config()["Admins"]:
-#         keyboard.add(InlineKeyboardButton(text=user, callback_data=f'user: {user}'))
-#     keyboard.add(InlineKeyboardButton(text='Добавить', callback_data='append'))
-#     return keyboard.adjust(1).as_markup()
+
+async def inline_admins():
+    keyboard = InlineKeyboardBuilder()
+    db.get_all_admins()
+    for admin in db.data:
+        keyboard.add(InlineKeyboardButton(text=admin[0], callback_data=f'user_id: {admin[0]}'))
+    keyboard.add(InlineKeyboardButton(text='Добавить', callback_data='append'))
+    return keyboard.adjust(1).as_markup()
+
+async def inline_questions():
+    keyboard = InlineKeyboardBuilder()
+    db.get_all_questions_without_answer()
+    for question in db.data:
+        keyboard.add(InlineKeyboardButton(text=question[3], callback_data=f'id_question: {question[0]}'))
+    return keyboard.adjust(1).as_markup()

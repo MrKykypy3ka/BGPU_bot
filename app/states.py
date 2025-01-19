@@ -1,10 +1,9 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class Newsletter(StatesGroup):
-    subscription = State()
-    link = State()
-    data = State()
+class Question(StatesGroup):
+    text = State()
+    user = State()
 
 
 class Admin(StatesGroup):

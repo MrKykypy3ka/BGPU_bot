@@ -1,4 +1,7 @@
 import sqlite3
+import logging
+
+logging.basicConfig(level=logging.ERROR)
 
 
 class Data:
@@ -7,61 +10,102 @@ class Data:
     def __new__(cls, filename):
         if cls._instance is None:
             cls._instance = super(Data, cls).__new__(cls)
-            cls.data = []
             cls._instance.filename = filename
+            cls._instance.data = []
+            cls._instance.connect()
+        return cls._instance
 
-    @staticmethod
-    def connect():
-        Data._instance.db = sqlite3.connect(Data._instance.filename)
-        Data._instance.cur = Data._instance.db.cursor()
+    def connect(self) -> None:
+        self.db = sqlite3.connect(self.filename)
+        self.cur = self.db.cursor()
 
-    def get_all_questions(self, column, fltr):
+    def close(self) -> None:
+        if self.db:
+            self.db.close()
+
+    def __del__(self):
+        self.close()
+
+    def get_all_questions(self) -> None:
         try:
-            if column is not None:
-                request = f"SELECT * FROM orders_with_filter WHERE {column} like %?%"
-                self.data = self.cur.execute(request, (fltr,)).fetchall()
-            else:
-                request = f"SELECT * FROM orders_with_filter"
-                self.data = self.cur.execute(request).fetchall()
+            request = "SELECT * FROM Questions"
+            self.data = self.cur.execute(request).fetchall()
         except sqlite3.Error as e:
-            self.data = e
+            logging.error(f"Ошибка получения данных: {e}")
 
-    def add_question(self, **kwargs):
+    def get_all_questions_without_answer(self) -> None:
+        try:
+            request = """
+                SELECT * FROM Questions
+                WHERE answer IS NULL OR answer = ''
+            """
+            self.data = self.cur.execute(request).fetchall()
+        except sqlite3.Error as e:
+            logging.error(f"Ошибка получения данных: {e}")
+
+    def add_question(self, **kwargs) -> None:
         try:
             sqlite_insert_query = """
-                INSERT INTO Orders (type_of_work, description, acceptance_date, customer, executor, status)
-                VALUES (?, ?, ?, ?, ?);
+                INSERT INTO Questions (user_id, user, text, answer)
+                VALUES (?, ?, ?, ?);
             """
-            data = (kwargs['type_of_work'], kwargs['description'], kwargs['acceptance_date'],
-                    kwargs['customer'], kwargs['executor'], kwargs['status'])
+            data = (kwargs['user_id'], kwargs['user'], kwargs['text'], "")
             self.cur.execute(sqlite_insert_query, data)
             self.db.commit()
-            return "Запись добавлена"
         except sqlite3.Error as e:
-            return f"Ошибка добавления: {e}"
+            logging.error(f"Ошибка добавления: {e}")
 
-    def update_question(self, **kwargs):
+    def update_question(self, **kwargs) -> None:
         try:
             sqlite_update_query = """
-                UPDATE Orders
-                SET type_of_work = ?, description = ?, acceptance_date = ?, 
-                    customer = ?, executor = ?, status = ?
-                WHERE id_order = ?;
+                UPDATE Questions
+                SET answer = ?
+                WHERE id_question = ?;
             """
-            data = (kwargs['type_of_work'], kwargs['description'], kwargs['acceptance_date'],
-                    kwargs['customer'], kwargs['executor'], kwargs['status'])
+            data = (kwargs['answer'], kwargs['id_question'])
             self.cur.execute(sqlite_update_query, data)
             self.db.commit()
-            return "Запись обновлена"
         except sqlite3.Error as e:
-            return f"Ошибка обновления: {e}"
+            logging.error(f"Ошибка обновления: {e}")
 
-    def delete_question(self, **kwargs):
+    def delete_question(self, **kwargs) -> None:
         try:
-            sqlite_delete_query = "DELETE FROM Orders WHERE id_order = ?;"
-            data = (kwargs['id_order'],)
+            sqlite_delete_query = """
+                DELETE FROM Questions WHERE id_question = ?;
+            """
+            data = (kwargs['id_question'],)
             self.cur.execute(sqlite_delete_query, data)
             self.db.commit()
-            return "Запись удалена"
         except sqlite3.Error as e:
-            return f"Ошибка удаления: {e}"
+            print(e)
+            logging.error(f"Ошибка удаления: {e}")
+
+    def get_all_admins(self) -> None:
+        try:
+            request = "SELECT * FROM Admins"
+            self.data = self.cur.execute(request).fetchall()
+        except sqlite3.Error as e:
+            logging.error(f"Ошибка получения данных: {e}")
+
+    def add_admins(self, **kwargs) -> None:
+        try:
+            sqlite_insert_query = """
+                INSERT INTO Admins (username)
+                VALUES (?);
+            """
+            data = (kwargs['username'],)
+            self.cur.execute(sqlite_insert_query, data)
+            self.db.commit()
+        except sqlite3.Error as e:
+            logging.error(f"Ошибка добавления: {e}")
+
+    def delete_admin(self, **kwargs) -> None:
+        try:
+            sqlite_delete_query = """
+                DELETE FROM Admins WHERE username = ?;
+            """
+            data = (kwargs['username'],)
+            self.cur.execute(sqlite_delete_query, data)
+            self.db.commit()
+        except sqlite3.Error as e:
+            logging.error(f"Ошибка удаления: {e}")

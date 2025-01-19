@@ -6,10 +6,12 @@ from aiogram.exceptions import TelegramBadRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import app.keyboards as kb
-
+from app.states import Admin, Question
+from database.scripts.db import Data
 
 router = Router()
 scheduler = AsyncIOScheduler()
+db = Data('database/bgpu.db')
 
 
 @router.message(CommandStart())
@@ -18,7 +20,6 @@ async def cmd_start(message: Message):
         f"""Привет {message.from_user.username}! На связи бот @careBGPUbot
 Я готов помочь тебе.""",
         reply_markup=kb.main_keyboard)
-
 
 @router.message(F.text == '👩‍❤️‍👨Меры поддержки молодых семей')
 async def set_message_list(message: Message):
@@ -36,87 +37,70 @@ async def set_message_list(message: Message):
 async def set_message_list(message: Message):
     await message.answer(text="Регистрация семьи в системе БГПУ", reply_markup=kb.registration_keyboard)
 
-@router.message(F.text == '✏️Вопрос-ответ')
-async def set_message_list(message: Message):
-    await message.answer(text="Задайте свой вопрос (по умолчанию вопрос анонимный, если хотите себя обозначить, представитесь и укажите свою группу)")
 
+@router.message(F.text == '✏️Вопрос-ответ')
+async def edit_message_list(message: Message, state: FSMContext):
+    await state.set_state(Question.text)
+    await message.answer(text="Задайте свой вопрос")
+
+@router.message(Question.text)
+async def add_question(message: Message, state: FSMContext):
+    await state.update_data(text=message.text)
+    await state.set_state(Question.user)
+    await message.answer('Как вас зовут? (если хотите задать анонимный вопрос, напишите «Аноним»)')
+
+@router.message(Question.user)
+async def add_question(message: Message, state: FSMContext):
+    await state.update_data(user=message.text)
+    data = await state.get_data()
+    db.add_question(user_id=message.from_user.id, user=data['user'], text=data['text'])
+    await message.answer('Спасибо за Ваш вопрос! Мы постараемся ответить на него как можно скорее🤗')
+    await message.bot.send_message(text=f"Кто-то задал новый вопрос", chat_id='1425132540')
+    await state.clear()
 
 @router.message(F.text == '⬅️В главное меню')
 async def set_message_list(message: Message):
     await message.answer(text="Служба заботы🤗", reply_markup=kb.main_keyboard)
 
-# @router.message(F.text.lower() == 'admin')
-# async def admin_menu(message: Message):
-#     if message.from_user.username in read_config()["Admins"]:
-#         await message.answer(f'Для изменения',
-#                              reply_markup=kb.admin_keyboard)
-#     else:
-#         await message.answer(f'Ты не админ😡')
-#
-# @router.callback_query(F.data.startswith('user'))
-# async def del_admin(callback: CallbackQuery):
-#     data = read_config()
-#     if callback.data.split(": ")[1] not in ["Mrkykypy3a", "lilith_sl"]:
-#         data["Admins"].remove(callback.data.split(": ")[1])
-#         write_config(data)
-#         await callback.message.answer(f'Админ удёлён', reply_markup=await kb.inline_admins())
-#     else:
-#         await callback.message.answer(f'Их нельзя удалять!', reply_markup=await kb.inline_admins())
-#
-# @router.callback_query(F.data == 'append')
-# async def write_admin(callback: CallbackQuery, state: FSMContext):
-#     await state.set_state(Admin.login)
-#     await callback.message.answer("Введите логин нового админа:")
-#
-# @router.message(Admin.login)
-# async def add_admin(message: Message, state: FSMContext):
-#     await state.update_data(login=message.text)
-#     data = read_config()
-#     login = await state.get_data()
-#     data["Admins"].append(login["login"])
-#     write_config(data)
-#     await state.clear()
-#     await message.answer(f'Админ добавлен', reply_markup=await kb.inline_admins())
-#
-# @router.message(Newsletter.subscription)
-# async def write_link(message: Message, state: FSMContext):
-#     await state.update_data(subscription=message.text)
-#     await state.set_state(Newsletter.link)
-#     await message.answer("Введите ссылку на материалы:")
-#
-#
-# @router.message(Newsletter.link)
-# async def write_link(message: Message, state: FSMContext):
-#     await state.update_data(link=message.text)
-#     await state.set_state(Newsletter.data)
-#     await message.answer("""Введите дату рассылки:\n
-# Формат даты (МСК): Год Месяц День Час Минуты""")
-#
-#
-# @router.message(Newsletter.data)
-# async def edit_message_list(message: Message, state: FSMContext):
-#     await state.update_data(date=message.text)
-#     config = read_config()
-#     data = await state.get_data()
-#     try:
-#         temp = dict()
-#         scheduler.remove_all_jobs()
-#         scheduler.add_job(send_newsletter_everyone, 'date', run_date=str(custom_date))
-#         await message.answer(f'Рассылка настроена', reply_markup=kb.admin_keyboard)
-#     except Exception as e:
-#         print(e)
-#         await message.answer('Некорректные данные')
-#     await state.clear()
-#
-# @router.message(People.login)
-# async def send_newsletter(message: Message, state: FSMContext):
-#     scheduler.add_job(send_newsletter_one, 'date',
-#                       run_date=str(datetime.now() + timedelta(seconds=5)),
-#                       args=[message.text])
-#     await message.answer(f"""Через 5 секунд придёт рассылка""")
-#     await state.clear()
+@router.message(F.text.lower() == 'admin')
+async def admin_menu(message: Message):
+    db.get_all_admins()
+    if message.from_user.username in [username[0] for username in db.data]:
+        await message.answer(f'Добро пожаловать {message.from_user.username}',
+                             reply_markup=kb.admin_keyboard)
+    else:
+        await message.answer(f'Ты не админ😡')
 
+@router.message(F.text == '👮🏻‍♂️Администраторы')
+async def set_message_list(message: Message):
+    await message.answer(f'Администраторы (Нажмите чтобы удалить):', reply_markup=await kb.inline_admins())
 
-# @router.message()
-# async def handle_unmatched_message(message: Message):
-#     await message.answer("Извините, я не понимаю это сообщение.", reply_markup=kb.main_keyboard)
+@router.message(F.text == '❓Ответить на вопрос')
+async def set_message_list(message: Message):
+    await message.answer(f'Список вопросов которые ждут ответа:', reply_markup=await kb.inline_questions())
+
+@router.callback_query(F.data.startswith('user'))
+async def del_admin(callback: CallbackQuery):
+    if callback.data.split(": ")[1] != "Mrkykypy3a":
+        db.delete_admin(username=callback.data.split(": ")[1])
+        await callback.message.answer(f'Админ удёлён', reply_markup=await kb.inline_admins())
+    else:
+        await callback.message.answer(f'Их нельзя удалять!', reply_markup=await kb.inline_admins())
+
+@router.callback_query(F.data == 'append')
+async def write_admin(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(Admin.login)
+    await callback.message.answer("Введите логин нового админа:")
+
+@router.message(Admin.login)
+async def add_admin(message: Message, state: FSMContext):
+    await state.update_data(login=message.text)
+    username = await state.get_data()
+    print(username['login'])
+    db.add_admins(username=username['login'])
+    await state.clear()
+    await message.answer(f'Админ добавлен', reply_markup=await kb.inline_admins())
+
+@router.message()
+async def handle_unmatched_message(message: Message):
+    await message.answer("Извините, я не понимаю это сообщение.", reply_markup=kb.main_keyboard)
