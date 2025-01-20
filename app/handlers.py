@@ -6,7 +6,7 @@ from aiogram.exceptions import TelegramBadRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import app.keyboards as kb
-from app.states import Admin, Question
+from app.states import Admin, Question, Answer
 from database.scripts.db import Data
 
 router = Router()
@@ -79,7 +79,7 @@ async def set_message_list(message: Message):
 async def set_message_list(message: Message):
     await message.answer(f'Список вопросов которые ждут ответа:', reply_markup=await kb.inline_questions())
 
-@router.callback_query(F.data.startswith('user'))
+@router.callback_query(F.data.startswith('user_id'))
 async def del_admin(callback: CallbackQuery):
     if callback.data.split(": ")[1] != "Mrkykypy3a":
         db.delete_admin(username=callback.data.split(": ")[1])
@@ -96,10 +96,39 @@ async def write_admin(callback: CallbackQuery, state: FSMContext):
 async def add_admin(message: Message, state: FSMContext):
     await state.update_data(login=message.text)
     username = await state.get_data()
-    print(username['login'])
     db.add_admins(username=username['login'])
     await state.clear()
     await message.answer(f'Админ добавлен', reply_markup=await kb.inline_admins())
+
+@router.message(F.text == 'cancel')
+async def close_FSM(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer(text=f"""Отправка ответа отменена""", reply_markup=kb.admin_keyboard)
+
+@router.callback_query(F.data.startswith('id_question'))
+async def write_answer(callback: CallbackQuery, state: FSMContext):
+    db.get_question(id_question=callback.data.split(": ")[1])
+    await state.update_data(user=db.data[0])
+    await callback.message.answer(f"""
+🤔Вопрос от <i>{db.data[0][2]}</i>
+<i>Вопрос:</i> {db.data[0][3]}
+    
+Введите ваш ответ""", reply_markup=kb.cancel_keyboard, parse_mode="HTML")
+    await state.set_state(Answer.text)
+
+
+@router.message(Answer.text)
+async def add_answer(message: Message, state: FSMContext):
+    await state.update_data(text=message.text)
+    data = await state.get_data()
+    db.update_question(answer=data['text'], id_question=data['user'][0])
+    await message.answer(f'✅Ваш ответ отправлен пользователю - {data['user'][2]}')
+    await message.bot.send_message(text=f"""
+⭐️Вам пришёл ответ на ваш вопрос⭐️
+<i>Ваш вопрос:</i> {data['user'][3]}
+<i>Ответ:</i> {data['text']}""", chat_id=data['user'][1],parse_mode='HTML')
+    await state.clear()
+
 
 @router.message()
 async def handle_unmatched_message(message: Message):

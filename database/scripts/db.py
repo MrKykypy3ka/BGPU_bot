@@ -43,6 +43,16 @@ class Data:
         except sqlite3.Error as e:
             logging.error(f"Ошибка получения данных: {e}")
 
+    def get_question(self, **kwargs) -> None:
+        try:
+            request = """
+                SELECT * FROM Questions
+                WHERE id_question = ?"""
+            data = (kwargs['id_question'],)
+            self.data = self.cur.execute(request, data).fetchall()
+        except sqlite3.Error as e:
+            logging.error(f"Ошибка получения данных: {e}")
+
     def add_question(self, **kwargs) -> None:
         try:
             sqlite_insert_query = """

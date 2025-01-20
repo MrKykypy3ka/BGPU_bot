@@ -47,13 +47,9 @@ registration_keyboard = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Форма регистрации", callback_data="contacts", url='new.bgpu.ru')]
 ])
 
-# async def inline_subscribes():
-#     keyboard = InlineKeyboardBuilder()
-#     subscription = read_config()["newsletter"]['subscription']
-#     for user in subscription:
-#         keyboard.add(InlineKeyboardButton(text=user, url=subscription[user]))
-#     keyboard.add(InlineKeyboardButton(text='Проверить подписки и подписаться на рассылку', callback_data='check'))
-#     return keyboard.adjust(1).as_markup()
+cancel_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+    [InlineKeyboardButton(text="Отложить ответ на вопрос", callback_data="cancel")]
+])
 
 async def inline_admins():
     keyboard = InlineKeyboardBuilder()

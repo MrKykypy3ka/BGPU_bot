@@ -8,3 +8,7 @@ class Question(StatesGroup):
 
 class Admin(StatesGroup):
     login = State()
+
+class Answer(StatesGroup):
+    user = State()
+    text = State()
