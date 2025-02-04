@@ -6,7 +6,7 @@ from database.scripts.db import Data
 db = Data('database/bgpu.db')
 
 main_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='👩‍❤️‍👨Меры поддержки молодых семей')],
+    [KeyboardButton(text='🫶🏻Меры поддержки')],
     [KeyboardButton(text='📋Контактная информация и образцы заявления')],
     [KeyboardButton(text='🏠Клуб молодых семей БГПУ «Очаг»')],
     [KeyboardButton(text='❓Мы стали молодой семьей, что дальше?')],
@@ -15,8 +15,16 @@ main_keyboard = ReplyKeyboardMarkup(keyboard=[
                                     input_field_placeholder='Меню ниже')
 
 support_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='️🏛БГПУ.')],
-    [KeyboardButton(text='🗺Амурская область.')],
+    [KeyboardButton(text='👩‍❤️‍👨Меры поддержки молодых семей')],
+    [KeyboardButton(text='🪖Меры поддержки участников СВО')],
+    [KeyboardButton(text='👨‍🦽Меры поддержки детей сирот и инвалидов')],
+    [KeyboardButton(text='⬅️В главное меню')]],
+                                    resize_keyboard=True,
+                                    input_field_placeholder='Меню ниже')
+
+level_support = ReplyKeyboardMarkup(keyboard=[
+    [KeyboardButton(text='️🏛БГПУ')],
+    [KeyboardButton(text='🗺Амурская область')],
     [KeyboardButton(text='⬅️В главное меню')]],
                                     resize_keyboard=True,
                                     input_field_placeholder='Меню ниже')
@@ -30,8 +38,9 @@ contacts_keyboard = ReplyKeyboardMarkup(keyboard=[
                                     input_field_placeholder='Меню ниже')
 
 club_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='️ℹ️О клубе')],
+    [KeyboardButton(text='ℹ️О клубе')],
     [KeyboardButton(text='👫Мероприятия и встречи')],
+    [KeyboardButton(text='📞Контакты')],
     [KeyboardButton(text='⬅️В главное меню')]],
                                     resize_keyboard=True,
                                     input_field_placeholder='Меню ниже')
@@ -44,7 +53,7 @@ admin_keyboard = ReplyKeyboardMarkup(keyboard=[
                                     input_field_placeholder='Меню ниже')
 
 registration_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-    [InlineKeyboardButton(text="Форма регистрации", callback_data="contacts", url='new.bgpu.ru')]
+    [InlineKeyboardButton(text="Форма регистрации", callback_data="contacts", url='https://forms.yandex.ru/u/67a05475e010db29150fbb49/')]
 ])
 
 cancel_keyboard = InlineKeyboardMarkup(inline_keyboard=[

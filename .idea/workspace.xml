@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9890ae8b-4159-4243-8b2b-e95cf78312d7" name="Changes" comment="complete: db, db scripts, state machines">
+    <list default="true" id="9890ae8b-4159-4243-8b2b-e95cf78312d7" name="Changes" comment="V 1.0">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/handlers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/keyboards.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/keyboards.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/states.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/states.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/bgpu.db" beforeDir="false" afterPath="$PROJECT_DIR$/database/bgpu.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/scripts/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/scripts/db.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -126,12 +121,21 @@
       <option name="project" value="LOCAL" />
       <updated>1737294978632</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="V 1.0">
+      <option name="closed" value="true" />
+      <created>1737384821539</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1737384821539</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="complete keyboards &amp; working on db" />
     <MESSAGE value="complete: db, db scripts, state machines" />
-    <option name="LAST_COMMIT_MESSAGE" value="complete: db, db scripts, state machines" />
+    <MESSAGE value="V 1.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="V 1.0" />
   </component>
 </project>

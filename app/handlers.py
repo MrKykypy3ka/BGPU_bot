@@ -6,7 +6,7 @@ from aiogram.exceptions import TelegramBadRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import app.keyboards as kb
-from app.states import Admin, Question, Answer
+from app.states import Admin, Question, Answer, Keyboard
 from database.scripts.db import Data
 
 router = Router()
@@ -17,21 +17,71 @@ db = Data('database/bgpu.db')
 @router.message(CommandStart())
 async def cmd_start(message: Message):
     await message.reply(
-        f"""Привет {message.from_user.username}! На связи бот @careBGPUbot
+        f"""Привет {message.from_user.username}! На связи бот @ZabotaBGPUbot
 Я готов помочь тебе.""",
         reply_markup=kb.main_keyboard)
 
+@router.message(F.text == '🫶🏻Меры поддержки')
+async def menu_support(message: Message):
+    await message.answer(text="Выберите вид поддержки:", reply_markup=kb.support_keyboard)
+
 @router.message(F.text == '👩‍❤️‍👨Меры поддержки молодых семей')
-async def set_message_list(message: Message):
-    await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.support_keyboard)
+async def support_young_family(message: Message, state: FSMContext):
+    await state.update_data(keyboard='young')
+    await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.level_support)
+
+@router.message(F.text == '🪖Меры поддержки участников СВО')
+async def support_veterans(message: Message, state: FSMContext):
+    await state.update_data(keyboard='veteran')
+    await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.level_support)
+
+@router.message(F.text == '👨‍🦽Меры поддержки детей сирот и инвалидов')
+async def support_disabilities(message: Message, state: FSMContext):
+    await state.update_data(keyboard='disabilities')
+    await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.level_support)
+
+
+@router.message(F.text == '️🏛БГПУ')
+async def support_BGPU(message: Message, state: FSMContext):
+    data = await state.get_data()
+    if data['keyboard'] == 'young':
+        print('young')
+    elif data['keyboard'] == 'veteran':
+        print('veteran')
+    elif data['keyboard'] == 'disabilities':
+        print('disabilities')
+    await state.clear()
+
+@router.message(F.text == '🗺Амурская область')
+async def support_BGPU(message: Message, state: FSMContext):
+    data = await state.get_data()
+    if data['keyboard'] == 'young':
+        print('young')
+    elif data['keyboard'] == 'veteran':
+        print('veteran')
+    elif data['keyboard'] == 'disabilities':
+        print('disabilities')
+    await state.clear()
 
 @router.message(F.text == '📋Контактная информация и образцы заявления')
-async def set_message_list(message: Message):
+async def menu_contacts_and_documents(message: Message):
     await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.contacts_keyboard)
 
 @router.message(F.text == '🏠Клуб молодых семей БГПУ «Очаг»')
-async def set_message_list(message: Message):
+async def menu_club_ochag(message: Message):
     await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.club_keyboard)
+
+@router.message(F.text == 'ℹ️О клубе')
+async def club_info(message: Message):
+    await message.answer_document(document=FSInputFile(path='data/files/Ochag/info.pdf'))
+
+@router.message(F.text == '👫Мероприятия и встречи')
+async def club_events(message: Message):
+    await message.answer_document(document=FSInputFile(path='data/files/Ochag/events.pdf'))
+
+@router.message(F.text == '📞Контакты')
+async def club_contacts(message: Message):
+    await message.answer_document(document=FSInputFile(path='data/files/Ochag/contacts.pdf'))
 
 @router.message(F.text == '❓Мы стали молодой семьей, что дальше?')
 async def set_message_list(message: Message):
