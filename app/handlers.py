@@ -47,28 +47,38 @@ async def support_disabilities(message: Message, state: FSMContext):
 async def support_BGPU(message: Message, state: FSMContext):
     data = await state.get_data()
     if data['keyboard'] == 'young':
-        await message.answer_photo(photo=FSInputFile(path='data/images/young_BSPU.jpg'))
+        await message.answer_photo(photo=FSInputFile(path='data/images/young_BSPU.jpg'),
+                                   caption=YOUNG_FAMALY,
+                                   reply_markup=kb.support_keyboard,
+                                   parse_mode='HTML')
         await message.answer_document(document=FSInputFile(path='data/files/young.pdf'))
     elif data['keyboard'] == 'veteran':
-        await message.answer_photo(photo=FSInputFile(path='data/images/veterans_BSPU.jpg'))
+        await message.answer_photo(photo=FSInputFile(path='data/images/veterans_BSPU.jpg'),
+                                   caption=VETERANS,
+                                   reply_markup=kb.support_keyboard,
+                                   parse_mode='HTML')
         await message.answer_document(document=FSInputFile(path='data/files/veterans.pdf'))
     elif data['keyboard'] == 'disabilities':
-        await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_BSPU.jpg'))
-        await message.answer_document(document=FSInputFile(path='data/files/disabilities.pdf'))
-        await message.answer_document(document=FSInputFile(path='data/files/orphans.pdf'))
-    await message.answer(reply_markup=kb.support_keyboard)
+        await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_BSPU.jpg'),
+                                   caption=ORPHANS,
+                                   reply_markup=kb.support_keyboard,
+                                   parse_mode='HTML')
+        media = [InputMediaDocument(media=FSInputFile('data/files/disabilities.pdf')), InputMediaDocument(media=FSInputFile('data/files/orphans.pdf'))]
+        await message.answer_media_group(media)
     await state.clear()
 
 @router.message(F.text == '🗺Амурская область')
 async def support_BGPU(message: Message, state: FSMContext):
     data = await state.get_data()
     if data['keyboard'] == 'young':
-        await message.answer_photo(photo=FSInputFile(path='data/images/young_amur.jpg'))
+        await message.answer_photo(photo=FSInputFile(path='data/images/young_amur.jpg'),
+                                   reply_markup=kb.support_keyboard)
     elif data['keyboard'] == 'veteran':
-        await message.answer_document(document=FSInputFile(path='data/files/veterans_amur.docx'))
+        await message.answer_document(document=FSInputFile(path='data/files/veterans_amur.docx'),
+                                      reply_markup=kb.support_keyboard)
     elif data['keyboard'] == 'disabilities':
-        await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_amur.jpg'))
-    await message.answer(reply_markup=kb.support_keyboard)
+        await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_amur.jpg'),
+                                   reply_markup=kb.support_keyboard)
     await state.clear()
 
 @router.message(F.text == '📋Контактная информация и образцы заявления')
@@ -89,23 +99,11 @@ async def contacts_amur(message: Message):
                                reply_markup=kb.contacts_keyboard,
                                parse_mode='HTML')
 
-
-class MediaGroup:
-    pass
-
-
 @router.message(F.text == '📑Образцы заявлений')
 async def support_BGPU(message: Message):
-    await message.answer_photo(photo=FSInputFile(path='data/images/sample_applications.jpg'))
-
-    files = [f'заявление {i}.docx' for i in range(1, 5)]
-    for filename in files:
-        with open(f"data/files/statement/{filename}", 'rb') as file:
-            await message.answer_document(InputFile('заявление 1.docx'))
-    #
-    #
-    # media_group = [InputMediaDocument(open(f"data/files/statement/заявление {i}.docx"), 'CAT') for i in range(1, 5)]
-    # await message.reply_media_group(media_group)
+    await message.answer_photo(photo=FSInputFile(path='data/images/sample_applications_sq.jpg'))
+    media = [InputMediaDocument(media=FSInputFile(f'data/files/statement/заявление {i}.docx')) for i in range(1, 5)]
+    await message.answer_media_group(media)
 
 
 @router.message(F.text == '🏠Клуб молодых семей БГПУ «Очаг»')
