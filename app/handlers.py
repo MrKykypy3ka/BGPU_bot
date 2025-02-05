@@ -1,6 +1,7 @@
 from aiogram import F, Router
+from aiogram.enums import InputMediaType
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery, FSInputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaDocument, InputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -8,6 +9,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import app.keyboards as kb
 from app.states import Admin, Question, Answer, Keyboard
 from database.scripts.db import Data
+from data.labels import *
 
 router = Router()
 scheduler = AsyncIOScheduler()
@@ -16,9 +18,10 @@ db = Data('database/bgpu.db')
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
-    await message.reply(
+    await message.answer(
         f"""Привет {message.from_user.username}! На связи бот @ZabotaBGPUbot
-Я готов помочь тебе.""",
+Я готов помочь тебе c получением информации о доступных мерах поддержки для различных групп граждан. Удобно, быстро и понятно!
+Выбери пожалуйста один из пунктов меню""",
         reply_markup=kb.main_keyboard)
 
 @router.message(F.text == '🫶🏻Меры поддержки')
@@ -40,32 +43,70 @@ async def support_disabilities(message: Message, state: FSMContext):
     await state.update_data(keyboard='disabilities')
     await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.level_support)
 
-
 @router.message(F.text == '️🏛БГПУ')
 async def support_BGPU(message: Message, state: FSMContext):
     data = await state.get_data()
     if data['keyboard'] == 'young':
-        print('young')
+        await message.answer_photo(photo=FSInputFile(path='data/images/young_BSPU.jpg'))
+        await message.answer_document(document=FSInputFile(path='data/files/young.pdf'))
     elif data['keyboard'] == 'veteran':
-        print('veteran')
+        await message.answer_photo(photo=FSInputFile(path='data/images/veterans_BSPU.jpg'))
+        await message.answer_document(document=FSInputFile(path='data/files/veterans.pdf'))
     elif data['keyboard'] == 'disabilities':
-        print('disabilities')
+        await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_BSPU.jpg'))
+        await message.answer_document(document=FSInputFile(path='data/files/disabilities.pdf'))
+        await message.answer_document(document=FSInputFile(path='data/files/orphans.pdf'))
+    await message.answer(reply_markup=kb.support_keyboard)
     await state.clear()
 
 @router.message(F.text == '🗺Амурская область')
 async def support_BGPU(message: Message, state: FSMContext):
     data = await state.get_data()
     if data['keyboard'] == 'young':
-        print('young')
+        await message.answer_photo(photo=FSInputFile(path='data/images/young_amur.jpg'))
     elif data['keyboard'] == 'veteran':
-        print('veteran')
+        await message.answer_document(document=FSInputFile(path='data/files/veterans_amur.docx'))
     elif data['keyboard'] == 'disabilities':
-        print('disabilities')
+        await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_amur.jpg'))
+    await message.answer(reply_markup=kb.support_keyboard)
     await state.clear()
 
 @router.message(F.text == '📋Контактная информация и образцы заявления')
 async def menu_contacts_and_documents(message: Message):
     await message.answer(text="Выберите уровень поддержки:", reply_markup=kb.contacts_keyboard)
+
+@router.message(F.text == '🏫БГПУ')
+async def contacts_BGPU(message: Message):
+    await message.answer_photo(photo=FSInputFile(path='data/images/contacts_BSPU.jpg'),
+                               caption=CONTACTS_BSPU,
+                               reply_markup=kb.contacts_keyboard,
+                               parse_mode='HTML')
+
+@router.message(F.text == '🌏Амурская область')
+async def contacts_amur(message: Message):
+    await message.answer_photo(photo=FSInputFile(path='data/images/contacts_amur.jpg'),
+                               caption=CONTACTS_REGION,
+                               reply_markup=kb.contacts_keyboard,
+                               parse_mode='HTML')
+
+
+class MediaGroup:
+    pass
+
+
+@router.message(F.text == '📑Образцы заявлений')
+async def support_BGPU(message: Message):
+    await message.answer_photo(photo=FSInputFile(path='data/images/sample_applications.jpg'))
+
+    files = [f'заявление {i}.docx' for i in range(1, 5)]
+    for filename in files:
+        with open(f"data/files/statement/{filename}", 'rb') as file:
+            await message.answer_document(InputFile('заявление 1.docx'))
+    #
+    #
+    # media_group = [InputMediaDocument(open(f"data/files/statement/заявление {i}.docx"), 'CAT') for i in range(1, 5)]
+    # await message.reply_media_group(media_group)
+
 
 @router.message(F.text == '🏠Клуб молодых семей БГПУ «Очаг»')
 async def menu_club_ochag(message: Message):
@@ -87,7 +128,6 @@ async def club_contacts(message: Message):
 async def set_message_list(message: Message):
     await message.answer(text="Регистрация семьи в системе БГПУ", reply_markup=kb.registration_keyboard)
 
-
 @router.message(F.text == '✏️Вопрос-ответ')
 async def edit_message_list(message: Message, state: FSMContext):
     await state.set_state(Question.text)
@@ -100,7 +140,7 @@ async def add_question(message: Message, state: FSMContext):
     await message.answer('Как вас зовут? (если хотите задать анонимный вопрос, напишите «Аноним»)')
 
 @router.message(Question.user)
-async def add_question(message: Message, state: FSMContext):
+async def write_question(message: Message, state: FSMContext):
     await state.update_data(user=message.text)
     data = await state.get_data()
     db.add_question(user_id=message.from_user.id, user=data['user'], text=data['text'])
@@ -166,7 +206,6 @@ async def write_answer(callback: CallbackQuery, state: FSMContext):
 Введите ваш ответ""", reply_markup=kb.cancel_keyboard, parse_mode="HTML")
     await state.set_state(Answer.text)
 
-
 @router.message(Answer.text)
 async def add_answer(message: Message, state: FSMContext):
     await state.update_data(text=message.text)
@@ -179,7 +218,6 @@ async def add_answer(message: Message, state: FSMContext):
 <i>Ответ:</i> {data['text']}""", chat_id=data['user'][1],parse_mode='HTML')
     await state.clear()
 
-
 @router.message()
 async def handle_unmatched_message(message: Message):
-    await message.answer("Извините, я не понимаю это сообщение.", reply_markup=kb.main_keyboard)
+    await message.reply("Извините, я не понимаю это сообщение.", reply_markup=kb.main_keyboard)

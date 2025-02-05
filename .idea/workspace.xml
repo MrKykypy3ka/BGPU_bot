@@ -5,7 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9890ae8b-4159-4243-8b2b-e95cf78312d7" name="Changes" comment="V 1.0">
+      <change afterPath="$PROJECT_DIR$/data/files/statement/заявление 1.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/files/statement/заявление 2.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/files/statement/заявление 3.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/files/statement/заявление 4.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/files/veterans_amur.docx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/images/description_picture.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/botBGPU.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/botBGPU.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/handlers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/keyboards.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/keyboards.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/images/contacts_BSPU.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/data/images/contacts_BSPU.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/images/contacts_amur.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/data/images/contacts_amur.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/images/description_picture.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/images/description_picture_scale.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/images/logo.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/labels.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/labels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/bgpu.db" beforeDir="false" afterPath="$PROJECT_DIR$/database/bgpu.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,6 +78,9 @@
       <recent name="C:\Users\olegm\Documents\GitHub\botBGPU" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Kykypy3a\PycharmProjects\BGPU_bot\data\files" />
+      <recent name="C:\Users\Kykypy3a\PycharmProjects\BGPU_bot\data\files\Ochag" />
+      <recent name="C:\Users\Kykypy3a\PycharmProjects\BGPU_bot\data\images" />
       <recent name="C:\Users\olegm\Documents\GitHub\botBGPU\data" />
       <recent name="C:\Users\olegm\Documents\GitHub\botBGPU" />
     </key>
@@ -131,6 +151,17 @@
     </task>
     <option name="localTasksCounter" value="4" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="complete keyboards &amp; working on db" />

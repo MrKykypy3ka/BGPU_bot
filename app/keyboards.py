@@ -30,8 +30,8 @@ level_support = ReplyKeyboardMarkup(keyboard=[
                                     input_field_placeholder='Меню ниже')
 
 contacts_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [KeyboardButton(text='️🏛БГПУ')],
-    [KeyboardButton(text='🗺Амурская область')],
+    [KeyboardButton(text='🏫БГПУ')],
+    [KeyboardButton(text='🌏Амурская область')],
     [KeyboardButton(text='📑Образцы заявлений')],
     [KeyboardButton(text='⬅️В главное меню')]],
                                     resize_keyboard=True,
