@@ -190,7 +190,9 @@ async def write_question(message: Message, state: FSMContext):
     data = await state.get_data()
     db.add_question(user_id=message.from_user.id, user=data['user'], text=data['text'])
     await message.answer('Спасибо за Ваш вопрос! Мы постараемся ответить на него как можно скорее🤗')
-    await message.bot.send_message(text=f"Кто-то задал новый вопрос", chat_id='1425132540')
+    db.get_all_admins()
+    for admin in [username[0] for username in db.data]:
+        await message.bot.send_message(text=f"⚠️Кто-то задал новый вопрос", chat_id=admin)
     await state.clear()
 
 @router.message(F.text == '⬅️В главное меню')
@@ -200,7 +202,10 @@ async def set_message_list(message: Message):
 @router.message(F.text.lower() == 'admin')
 async def admin_menu(message: Message):
     db.get_all_admins()
-    if message.from_user.username in [username[0] for username in db.data]:
+    user_name = message.from_user.username
+    if user_name in [username[1] for username in db.data]:
+        id_user = message.from_user.id
+        db.edit_admin(username=user_name, id_user=id_user)
         await message.answer(f'Добро пожаловать {message.from_user.username}',
                              reply_markup=kb.admin_keyboard)
     else:
@@ -231,7 +236,7 @@ async def write_admin(callback: CallbackQuery, state: FSMContext):
 async def add_admin(message: Message, state: FSMContext):
     await state.update_data(login=message.text)
     username = await state.get_data()
-    db.add_admins(username=username['login'])
+    db.add_admin(username=username['login'])
     await state.clear()
     await message.answer(f'Админ добавлен', reply_markup=await kb.inline_admins())
 

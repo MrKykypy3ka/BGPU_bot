@@ -97,7 +97,7 @@ class Data:
         except sqlite3.Error as e:
             logging.error(f"Ошибка получения данных: {e}")
 
-    def add_admins(self, **kwargs) -> None:
+    def add_admin(self, **kwargs) -> None:
         try:
             sqlite_insert_query = """
                 INSERT INTO Admins (username)
@@ -108,6 +108,19 @@ class Data:
             self.db.commit()
         except sqlite3.Error as e:
             logging.error(f"Ошибка добавления: {e}")
+
+    def edit_admin(self, **kwargs) -> None:
+        try:
+            sqlite_update_query = """
+                   UPDATE Admins
+                   SET id_user = ?
+                   WHERE username = ?;
+               """
+            data = (kwargs['id_user'], kwargs['username'])
+            self.cur.execute(sqlite_update_query, data)
+            self.db.commit()
+        except sqlite3.Error as e:
+            logging.error(f"Ошибка обновления: {e}")
 
     def delete_admin(self, **kwargs) -> None:
         try:

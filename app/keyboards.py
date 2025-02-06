@@ -64,7 +64,7 @@ async def inline_admins():
     keyboard = InlineKeyboardBuilder()
     db.get_all_admins()
     for admin in db.data:
-        keyboard.add(InlineKeyboardButton(text=admin[0], callback_data=f'user_id: {admin[0]}'))
+        keyboard.add(InlineKeyboardButton(text=admin[1], callback_data=f'user_id: {admin[1]}'))
     keyboard.add(InlineKeyboardButton(text='Добавить', callback_data='append'))
     return keyboard.adjust(1).as_markup()
 
