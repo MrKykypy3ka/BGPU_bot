@@ -4,12 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9890ae8b-4159-4243-8b2b-e95cf78312d7" name="Changes" comment="V 1.0">
+    <list default="true" id="9890ae8b-4159-4243-8b2b-e95cf78312d7" name="Changes" comment="in progress: statement">
       <change beforePath="$PROJECT_DIR$/.idea/botBGPU.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/botBGPU.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/handlers.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/handlers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/labels.py" beforeDir="false" afterPath="$PROJECT_DIR$/data/labels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/bgpu.db" beforeDir="false" afterPath="$PROJECT_DIR$/database/bgpu.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,7 +35,7 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/MrKykypy3ka/BGPU_bot.git&quot;,
+    &quot;url&quot;: &quot;https://github.com/MrKykypy3ka/BGPU_bot&quot;,
     &quot;accountId&quot;: &quot;0a1fdd32-9f60-49c9-acea-2b947d1f7b86&quot;
   }
 }</component>
@@ -99,7 +100,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-495700d161d3-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.22562.220" />
+        <option value="bundled-python-sdk-fb887030ada0-aa17d162503b-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-243.21565.199" />
       </set>
     </attachedChunks>
   </component>

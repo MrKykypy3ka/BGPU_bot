@@ -1,13 +1,11 @@
 from aiogram import F, Router
-from aiogram.enums import InputMediaType
 from aiogram.filters import CommandStart
-from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaDocument, InputFile
+from aiogram.types import Message, CallbackQuery, FSInputFile, InputMediaDocument
 from aiogram.fsm.context import FSMContext
-from aiogram.exceptions import TelegramBadRequest
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 import app.keyboards as kb
-from app.states import Admin, Question, Answer, Keyboard
+from app.states import Admin, Question, Answer
 from database.scripts.db import Data
 from data.labels import *
 
@@ -15,6 +13,7 @@ router = Router()
 scheduler = AsyncIOScheduler()
 db = Data('database/bgpu.db')
 
+file_cache = {}
 
 @router.message(CommandStart())
 async def cmd_start(message: Message):
@@ -51,20 +50,39 @@ async def support_BGPU(message: Message, state: FSMContext):
                                    caption=YOUNG_FAMALY,
                                    reply_markup=kb.support_keyboard,
                                    parse_mode='HTML')
-        await message.answer_document(document=FSInputFile(path='data/files/young.pdf'))
+        if 'young_BSPU_pdf' in file_cache:
+            await message.answer_document(document=file_cache['young_BSPU_pdf'])
+        else:
+            msg = await message.answer_document(document=FSInputFile(path='data/files/young.pdf'))
+            file_cache['young_BSPU_pdf'] = msg.document.file_id
     elif data['keyboard'] == 'veteran':
         await message.answer_photo(photo=FSInputFile(path='data/images/veterans_BSPU.jpg'),
                                    caption=VETERANS,
                                    reply_markup=kb.support_keyboard,
                                    parse_mode='HTML')
-        await message.answer_document(document=FSInputFile(path='data/files/veterans.pdf'))
+        if 'veteran_BSPU_pdf' in file_cache:
+            await message.answer_document(document=file_cache['veteran_BSPU_pdf'])
+        else:
+            msg = await message.answer_document(document=FSInputFile(path='data/files/veterans.pdf'))
+
+            file_cache['veteran_BSPU_pdf'] = msg.document.file_id
     elif data['keyboard'] == 'disabilities':
         await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_BSPU.jpg'),
                                    caption=ORPHANS,
                                    reply_markup=kb.support_keyboard,
                                    parse_mode='HTML')
-        media = [InputMediaDocument(media=FSInputFile('data/files/disabilities.pdf')), InputMediaDocument(media=FSInputFile('data/files/orphans.pdf'))]
-        await message.answer_media_group(media)
+        if 'orphans_pdf' in file_cache:
+            await message.answer_document(document=file_cache['orphans_pdf'])
+        else:
+            msg = await message.answer_document(document=FSInputFile(path='data/files/orphans.pdf'))
+            file_cache['orphans_pdf'] = msg.document.file_id
+        await message.answer(text=DISABILITIES)
+
+        if 'disabilities_pdf' in file_cache:
+            await message.answer_document(document=file_cache['disabilities_pdf'])
+        else:
+            msg = await message.answer_document(document=FSInputFile(path='data/files/disabilities.pdf'))
+            file_cache['disabilities_pdf'] = msg.document.file_id
     await state.clear()
 
 @router.message(F.text == '🗺Амурская область')
@@ -74,8 +92,13 @@ async def support_BGPU(message: Message, state: FSMContext):
         await message.answer_photo(photo=FSInputFile(path='data/images/young_amur.jpg'),
                                    reply_markup=kb.support_keyboard)
     elif data['keyboard'] == 'veteran':
-        await message.answer_document(document=FSInputFile(path='data/files/veterans_amur.docx'),
+        cache_key = 'veterans_amur_pdf'
+        if cache_key in file_cache:
+            await message.answer_document(document=file_cache[cache_key])
+        else:
+            msg = await message.answer_document(document=FSInputFile(path='data/files/veterans_amur.docx'),
                                       reply_markup=kb.support_keyboard)
+            file_cache[cache_key] = msg.document.file_id
     elif data['keyboard'] == 'disabilities':
         await message.answer_photo(photo=FSInputFile(path='data/images/disabilities_amur.jpg'),
                                    reply_markup=kb.support_keyboard)
@@ -101,10 +124,19 @@ async def contacts_amur(message: Message):
 
 @router.message(F.text == '📑Образцы заявлений')
 async def support_BGPU(message: Message):
+    cache_key = 'statements_doc_ids'
     await message.answer_photo(photo=FSInputFile(path='data/images/sample_applications_sq.jpg'))
-    media = [InputMediaDocument(media=FSInputFile(f'data/files/statement/заявление {i}.docx')) for i in range(1, 5)]
-    await message.answer_media_group(media)
-
+    if cache_key in file_cache:
+        media = [InputMediaDocument(media=file_id) for file_id in file_cache[cache_key]]
+        await message.answer_media_group(media)
+    else:
+        media = [InputMediaDocument(media=FSInputFile(f'data/files/statement/заявление {i}.docx')) for i in range(1, 5)]
+        messages = await message.answer_media_group(media)
+        file_ids = []
+        for msg in messages:
+            if msg.document:
+                file_ids.append(msg.document.file_id)
+        file_cache[cache_key] = file_ids
 
 @router.message(F.text == '🏠Клуб молодых семей БГПУ «Очаг»')
 async def menu_club_ochag(message: Message):
@@ -112,15 +144,30 @@ async def menu_club_ochag(message: Message):
 
 @router.message(F.text == 'ℹ️О клубе')
 async def club_info(message: Message):
-    await message.answer_document(document=FSInputFile(path='data/files/Ochag/info.pdf'))
+    cache_key = 'info_pdf'
+    if cache_key in file_cache:
+        await message.answer_document(document=file_cache[cache_key])
+    else:
+        msg = await message.answer_document(document=FSInputFile(path='data/files/Ochag/info.pdf'))
+        file_cache[cache_key] = msg.document.file_id
+
 
 @router.message(F.text == '👫Мероприятия и встречи')
 async def club_events(message: Message):
-    await message.answer_document(document=FSInputFile(path='data/files/Ochag/events.pdf'))
+    if 'club_events_pdf' in file_cache:
+        await message.answer_document(document=file_cache['club_events_pdf'])
+    else:
+        msg = await message.answer_document(document=FSInputFile(path='data/files/Ochag/events.pdf'))
+        file_cache['club_events_pdf'] = msg.document.file_id
 
 @router.message(F.text == '📞Контакты')
 async def club_contacts(message: Message):
-    await message.answer_document(document=FSInputFile(path='data/files/Ochag/contacts.pdf'))
+    if 'club_contacts_pdf' in file_cache:
+        await message.answer_document(document=file_cache['club_contacts_pdf'])
+    else:
+        msg = await message.answer_document(document=FSInputFile(path='data/files/Ochag/contacts.pdf'))
+
+        file_cache['club_contacts_pdf'] = msg.document.file_id
 
 @router.message(F.text == '❓Мы стали молодой семьей, что дальше?')
 async def set_message_list(message: Message):

@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_Update_at_05_02_2025_11_52_[Changes]" date="1738723968898" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_02_2025_11_52_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 05.02.2025 11:52 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="database/bgpu.db" />
+    <option name="AFTER_PATH" value="database/bgpu.db" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_05_02_2025_11_52_[Changes]/bgpu.db" />
+  </binary>
+</changelist>
